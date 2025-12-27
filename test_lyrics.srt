@@ -1,0 +1,15 @@
+1
+00:00:01,000 --> 00:00:04,000
+Welcome to your LoopMaster Pro render.
+
+2
+00:00:04,500 --> 00:00:08,000
+The spectrum below is reacting to your audio frequencies.
+
+3
+00:00:08,500 --> 00:00:12,000
+This text is rendered via ImageMagick and MoviePy.
+
+4
+00:00:13,000 --> 00:00:18,000
+High-quality 4K music loops, powered by AI.

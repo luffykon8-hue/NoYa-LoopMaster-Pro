@@ -1,0 +1,54 @@
+from PySide6.QtWidgets import (QPushButton, QVBoxLayout, QWidget, QLabel, 
+                             QSlider, QComboBox, QFrame)
+from PySide6.QtCore import Qt, Signal
+
+class DropZone(QPushButton):
+    file_dropped = Signal(str)
+    def __init__(self, label):
+        super().__init__(label)
+        self.setAcceptDrops(True)
+        self.setMinimumHeight(60)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls(): event.accept()
+    
+    def dropEvent(self, event):
+        path = event.mimeData().urls()[0].toLocalFile()
+        self.setText(f"✅ {path.split('/')[-1]}")
+        self.file_dropped.emit(path)
+        event.accept()
+
+class ControlPanel(QFrame):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout(self)
+        self.video_path = ""
+        self.audio_path = ""
+        
+        self.img_btn = DropZone("Drop Image/Video Here")
+        self.audio_btn = DropZone("Drop Music Here")
+        
+        self.res_box = QComboBox()
+        self.res_box.addItems(["720p", "1080p", "2K", "4K"])
+        
+        self.proc_box = QComboBox()
+        self.proc_box.addItems(["CPU", "GPU (Nvidia)", "GPU (AMD)"])
+
+        self.dur_slider = QSlider(Qt.Horizontal)
+        self.dur_slider.setRange(1, 120)
+        
+        layout.addWidget(QLabel("<b>Inputs</b>"))
+        layout.addWidget(self.img_btn)
+        layout.addWidget(self.audio_btn)
+        layout.addWidget(QLabel("<b>Resolution & Hardware</b>"))
+        layout.addWidget(self.res_box)
+        layout.addWidget(self.proc_box)
+        layout.addWidget(QLabel("<b>Duration (Minutes)</b>"))
+        layout.addWidget(self.dur_slider)
+
+        # Connect signals to store the actual full paths
+        self.img_btn.file_dropped.connect(self._set_video_path)
+        self.audio_btn.file_dropped.connect(self._set_audio_path)
+
+    def _set_video_path(self, path): self.video_path = path
+    def _set_audio_path(self, path): self.audio_path = path

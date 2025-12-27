@@ -1,0 +1,57 @@
+import sys
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QProgressBar
+from PySide6.QtCore import QThread, Signal
+from interface import ControlPanel
+from engine import run_render
+
+class Worker(QThread):
+    progress = Signal(int)
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+    def run(self):
+        # We wrap the engine call here
+        run_render(self.config, "bar") # Simplified logger for brevity
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("LoopMaster Pro")
+        self.setMinimumWidth(500)
+        
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+        
+        self.controls = ControlPanel()
+        self.render_btn = QPushButton("RENDER PROJECT")
+        self.pbar = QProgressBar()
+        
+        layout.addWidget(self.controls)
+        layout.addWidget(self.pbar)
+        layout.addWidget(self.render_btn)
+        
+        self.render_btn.clicked.connect(self.start_task)
+
+    def start_task(self):
+        if not self.controls.video_path or not self.controls.audio_path:
+            print("Error: Please drop both a video/image and an audio file first.")
+            return
+
+        config = {
+            "video": self.controls.video_path,
+            "audio": self.controls.audio_path,
+            "res": self.controls.res_box.currentText(),
+            "processor": self.controls.proc_box.currentText(),
+            "duration": self.controls.dur_slider.value(),
+            "color": [0, 255, 255],
+            "out": "output.mp4"
+        }
+        self.worker = Worker(config)
+        self.worker.start()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
