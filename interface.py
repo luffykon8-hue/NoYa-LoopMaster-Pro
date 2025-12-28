@@ -45,6 +45,9 @@ class ControlPanel(QFrame):
         self.audio_btn = DropZone("Drop Music Here")
         
         self.audio_list = QListWidget()
+        self.audio_list.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.audio_list.setDragDropMode(QAbstractItemView.InternalMove)
+        self.audio_list.setDefaultDropAction(Qt.MoveAction)
         
         btn_layout = QHBoxLayout()
         self.shuffle_btn = QPushButton("Shuffle")
@@ -56,6 +59,9 @@ class ControlPanel(QFrame):
         
         self.res_box = QComboBox()
         self.res_box.addItems(["720p", "1080p", "2K", "4K"])
+        
+        self.ar_box = QComboBox()
+        self.ar_box.addItems(["16:9", "9:16", "1:1", "4:3", "21:9"])
         
         self.proc_box = QComboBox()
         self.proc_box.addItems(["CPU", "GPU (Nvidia)", "GPU (AMD)"])
@@ -73,7 +79,10 @@ class ControlPanel(QFrame):
         
         layout.addLayout(input_layout)
         layout.addWidget(QLabel("<b>Resolution & Hardware</b>"))
-        layout.addWidget(self.res_box)
+        res_layout = QHBoxLayout()
+        res_layout.addWidget(self.res_box)
+        res_layout.addWidget(self.ar_box)
+        layout.addLayout(res_layout)
         layout.addWidget(self.proc_box)
 
         # Connect signals to store the actual full paths
